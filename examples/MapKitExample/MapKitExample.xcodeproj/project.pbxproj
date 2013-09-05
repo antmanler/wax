@@ -65,6 +65,7 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765FD0DF74451002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765FC0DF74451002DB57D /* CoreGraphics.framework */; };
+		B863C03E17D946230075CA8E /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = B863C03D17D946230075CA8E /* Default-568h@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -202,6 +203,7 @@
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MapKitExample_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MapKitExample_Prefix.pch; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* MapKitExample-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "MapKitExample-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		B863C03D17D946230075CA8E /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -500,6 +502,7 @@
 			isa = PBXGroup;
 			children = (
 				8D1107310486CEB800E47090 /* MapKitExample-Info.plist */,
+				B863C03D17D946230075CA8E /* Default-568h@2x.png */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -569,6 +572,7 @@
 				047CDB581322C0340057CE3F /* AppDelegate.lua in Resources */,
 				047CDB591322C0340057CE3F /* SimpleAnnotation.lua in Resources */,
 				047CDB5A1322C0340057CE3F /* SimpleMapController.lua in Resources */,
+				B863C03E17D946230075CA8E /* Default-568h@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -663,6 +667,7 @@
 				GCC_PREFIX_HEADER = MapKitExample_Prefix.pch;
 				HEADER_SEARCH_PATHS = "$(SDK_ROOT)/usr/include/libxml2";
 				INFOPLIST_FILE = "MapKitExample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				PRODUCT_NAME = MapKitExample;
 				WAX_COMPILE_SCRIPTS = "";
 			};
@@ -677,6 +682,7 @@
 				GCC_PREFIX_HEADER = MapKitExample_Prefix.pch;
 				HEADER_SEARCH_PATHS = "$(SDK_ROOT)/usr/include/libxml2";
 				INFOPLIST_FILE = "MapKitExample-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1;
 				PRODUCT_NAME = MapKitExample;
 				VALIDATE_PRODUCT = YES;
 				WAX_COMPILE_SCRIPTS = "";
