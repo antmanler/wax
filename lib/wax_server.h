@@ -2,14 +2,13 @@
 
 @class wax_server;
 
-NSString * const TCPServerErrorDomain;
+NSString *const TCPServerErrorDomain;
 
 typedef enum {
     kTCPServerCouldNotBindToIPv4Address = 1,
     kTCPServerCouldNotBindToIPv6Address = 2,
     kTCPServerNoSocketsAvailable = 3,
 } TCPServerErrorCode;
-
 
 @protocol WaxServerDelegate
 
@@ -20,17 +19,16 @@ typedef enum {
 
 @end
 
+@interface wax_server : NSObject <NSStreamDelegate, NSNetServiceDelegate>{
+    CFSocketRef             _ipv4socket;
+    id <WaxServerDelegate>  _delegate;
 
-@interface wax_server : NSObject <NSStreamDelegate, NSNetServiceDelegate> {	
-	CFSocketRef _ipv4socket;
-	id<WaxServerDelegate> _delegate;
-
-	NSNetService *_netService;
-	NSInputStream *_inStream;
-	NSOutputStream *_outStream;
+    NSNetService    *_netService;
+    NSInputStream   *_inStream;
+    NSOutputStream  *_outStream;
 }
-	
-@property(nonatomic, assign) id<WaxServerDelegate> delegate;
+
+@property(nonatomic, assign) id <WaxServerDelegate> delegate;
 
 - (NSError *)startOnPort:(NSUInteger)port;
 - (BOOL)stop;
@@ -43,5 +41,5 @@ typedef enum {
 @end
 
 // This is needed because the runtime doesn't automatically load protocols
-@interface HACK_WAX_DELEGATE_IMPLEMENTOR <WaxServerDelegate> {} 
+@interface HACK_WAX_DELEGATE_IMPLEMENTOR : NSObject  <WaxServerDelegate>{}
 @end

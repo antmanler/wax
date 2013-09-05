@@ -8,10 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-
-@interface wax_gc : NSObject {
-
-}
+@interface wax_gc : NSObject {}
 
 + (void)start;
 + (void)stop;
