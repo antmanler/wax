@@ -12,3 +12,11 @@ function applicationDidFinishLaunching(self, application)
   
   self.window:makeKeyAndVisible()
 end
+
+function applicationDidEnterBackground(self, application)
+  print('applicationDidEnterBackground')
+end
+
+function applicationWillEnterForeground(self, application)
+  print('applicationWillEnterForeground')
+end
