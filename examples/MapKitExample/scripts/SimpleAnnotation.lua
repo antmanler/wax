@@ -4,11 +4,11 @@ function initWithLatLong(self, lat, long)
   self.super:init()
   self.lat = lat
   self.long = long
-  
   -- These variables have underscores because they would have conflicted with 
   -- method names required by the MKAnnotation protocol.
-  self._title = 'Untitled'
-  self._subtitle = ''
+  self.setTitle(self, 'Untitled')
+  self.setSubtitle(self, 'Untitled')
+  return self
 end
 
 function coordinate(self)
@@ -21,7 +21,6 @@ end
 
 function setTitle(self, title)
   self._title = title
-  return nil
 end
 
 function subtitle(self)
@@ -30,5 +29,4 @@ end
 
 function setSubtitle(self, subtitle)
   self._subtitle = subtitle
-  return nil
 end
