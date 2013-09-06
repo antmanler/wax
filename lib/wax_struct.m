@@ -143,8 +143,9 @@ void wax_struct_setValueAt(lua_State *L, wax_struct_userdata *structUserdata, in
         type[0] = simplifiedTypeDescription[i];
     }
 
-    int     size;
-    void    *value = wax_copyToObjc(L, type, stackIndex, &size);
+    int size;
+    id  *value = nil;
+    wax_copyToObjc(L, type, stackIndex, &size, (void **)&value);
     memcpy(structUserdata->data + position, value, size);
     free(value);
 }
@@ -353,7 +354,8 @@ static int pack(lua_State *L)
         int size;
         int stackIndex = i + 2;	// start at 2 (1 is where the type description is)
 
-        void *value = wax_copyToObjc(L, &simplifiedTypeDescription[i], stackIndex, &size);
+        void *value = nil;
+        wax_copyToObjc(L, &simplifiedTypeDescription[i], stackIndex, &size, (void **)&value);
         luaL_addlstring(&b, value, size);
         free(value);
     }

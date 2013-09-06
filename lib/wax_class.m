@@ -211,7 +211,8 @@ static id valueForUndefinedKey(id self, SEL cmd, NSString *key)
     wax_instance_pushUserdata(L, self);
     lua_getfield(L, -1, [key UTF8String]);
 
-    id *keyValue = wax_copyToObjc(L, "@", -1, nil);
+    id *keyValue = nil;
+    wax_copyToObjc(L, "@", -1, nil, (void **)&keyValue);
     result = *keyValue;
     free(keyValue);
 

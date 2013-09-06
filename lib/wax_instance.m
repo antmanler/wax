@@ -498,7 +498,7 @@ static int methodClosure(lua_State *L)
 
     for (int i = 0; i < objcArgumentCount; i++)
     {
-        arguements[i] = wax_copyToObjc(L, [signature getArgumentTypeAtIndex:i + 2], i + 2, nil);
+		wax_copyToObjc(L, [signature getArgumentTypeAtIndex:i + 2], i + 2, nil, (void **)&arguements[i]);
         [invocation setArgument:arguements[i] atIndex:i + 2];
     }
 
@@ -723,9 +723,9 @@ error:
             END_STACK_MODIFY(L, 0)                                                                                       \
             return returnValue;                                                                                          \
         }                                                                                                                \
-        NSMethodSignature   *signature = [self methodSignatureForSelector:_cmd];                                         \
-        _type_              *pReturnValue = (_type_ *)wax_copyToObjc(L, [signature methodReturnType], -1, nil);          \
-        _type_              returnValue = *pReturnValue;                                                                 \
+        NSMethodSignature *signature = [self methodSignatureForSelector:_cmd];                                           \
+        _type_ *pReturnValue = nil;wax_copyToObjc(L, [signature methodReturnType], -1, nil, (void **)&pReturnValue);                                   \
+        _type_ returnValue = *pReturnValue;                                                                              \
         free(pReturnValue);                                                                                              \
         END_STACK_MODIFY(L, 0)                                                                                           \
         return returnValue;                                                                                              \

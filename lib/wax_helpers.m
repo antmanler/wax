@@ -324,7 +324,7 @@ void wax_fromInstance(lua_State *L, id instance)
 #define WAX_TO_BOOL_OR_CHAR(_type_) *outsize = sizeof(_type_);value = calloc(sizeof(_type_), 1);*((_type_ *)value) = (_type_)(lua_isstring(L, stackIndex) ? lua_tostring(L, stackIndex)[0] : lua_toboolean(L, stackIndex));
 
 // MAKE SURE YOU RELEASE THE RETURN VALUE!
-void *wax_copyToObjc(lua_State *L, const char *typeDescription, int stackIndex, int *outsize)
+void wax_copyToObjc(lua_State *L, const char *typeDescription, int stackIndex, int *outsize, void **outBuffer)
 {
     void *value = nil;
 
@@ -562,8 +562,10 @@ void *wax_copyToObjc(lua_State *L, const char *typeDescription, int stackIndex, 
 
                                 while (lua_next(L, -2))
                                 {
-                                    id  *key = wax_copyToObjc(L, "@", -2, nil);
-                                    id  *object = wax_copyToObjc(L, "@", -1, nil);
+                                    id *key = nil;
+                                    wax_copyToObjc(L, "@", -2, nil, (void **)&key);
+                                    id *object = nil;
+                                    wax_copyToObjc(L, "@", -1, nil, (void **)&object);
                                     instance[*key] = *object;
                                     lua_pop(L, 1);	// Pop off the value
                                     free(key);
@@ -579,7 +581,8 @@ void *wax_copyToObjc(lua_State *L, const char *typeDescription, int stackIndex, 
                                 while (lua_next(L, -2))
                                 {
                                     int index = lua_tonumber(L, -2) - 1;
-                                    id  *object = wax_copyToObjc(L, "@", -1, nil);
+                                    id  *object = nil;
+                                    wax_copyToObjc(L, "@", -1, nil, (void **)&object);
                                     [instance insertObject:*object atIndex:index];
                                     lua_pop(L, 1);
                                     free(object);
@@ -653,7 +656,8 @@ void *wax_copyToObjc(lua_State *L, const char *typeDescription, int stackIndex, 
             break;
     }
 
-    return value;
+	//return value;
+    *outBuffer = value;
 }
 
 // You can't tell if there are 0 or 1 arguments based on selector alone, so pass in an SEL[2] for possibleSelectors

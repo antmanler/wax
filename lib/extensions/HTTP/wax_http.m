@@ -186,7 +186,8 @@ static NSDictionary *getHeaders(lua_State *L, int tableIndex)
 
     if (!lua_isnil(L, -1))
     {
-        id *result = wax_copyToObjc(L, "@", -1, nil);
+        id *result = nil;
+        wax_copyToObjc(L, "@", -1, nil, (void **)&result);
         headers = *result;
         free(result);
     }

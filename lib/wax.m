@@ -292,8 +292,10 @@ static int tolua(lua_State *L)
 
 static int toobjc(lua_State *L)
 {
-    id  *instancePointer = wax_copyToObjc(L, "@", 1, nil);
-    id  instance = *(id *)instancePointer;
+    id *instancePointer = nil;
+
+    wax_copyToObjc(L, "@", 1, nil, (void **)&instancePointer);
+    id instance = *(id *)instancePointer;
 
     wax_instance_create(L, instance, NO);
 
