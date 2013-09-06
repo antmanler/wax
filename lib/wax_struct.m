@@ -91,7 +91,7 @@ wax_struct_userdata *wax_struct_create(lua_State *L, const char *typeDescription
         if (endLocation)
         {
             int size = endLocation - &typeDescription[1];
-            structUserdata->name = calloc(sizeof(char *), size + 1);// add 1 for '\0'
+            structUserdata->name = calloc(sizeof(char), size + 1);// add 1 for '\0'
             strncpy(structUserdata->name, &typeDescription[1], size);
         }
     }
@@ -269,7 +269,7 @@ static int copy(lua_State *L)
 
     int size = strlen(structUserdata->name);
 
-    newStructUserdata->name = calloc(sizeof(char *), size + 1);	// add 1 for '\0'
+    newStructUserdata->name = calloc(sizeof(char), size + 1);	// add 1 for '\0'
     strncpy(newStructUserdata->name, structUserdata->name, size);
 
     return 1;
