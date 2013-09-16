@@ -20,7 +20,7 @@ typedef enum {
 @end
 
 @interface wax_server : NSObject <NSStreamDelegate, NSNetServiceDelegate>{
-    CFSocketRef             _ipv4socket;
+    CFSocketRef _ipv4socket;
     id <WaxServerDelegate>  _delegate;
 
     NSNetService    *_netService;

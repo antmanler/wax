@@ -51,7 +51,7 @@ int luaopen_wax_class(lua_State *L)
     luaL_register(L, NULL, MetaMethods);
     luaL_register(L, WAX_CLASS_METATABLE_NAME, Methods);
 
-	// Set the metatable for the module
+    // Set the metatable for the module
     luaL_getmetatable(L, WAX_CLASS_METATABLE_NAME);
     lua_setmetatable(L, -2);
 
@@ -64,14 +64,11 @@ int luaopen_wax_class(lua_State *L)
 static int __index(lua_State *L)
 {
     const char  *className = luaL_checkstring(L, 2);
-    Class       klass = objc_getClass(className);
+    Class klass = objc_getClass(className);
 
-    if (klass)
-    {
+    if (klass) {
         wax_instance_create(L, klass, YES);
-    }
-    else
-    {
+    } else {
         lua_pushnil(L);
     }
 
@@ -82,54 +79,46 @@ static int __index(lua_State *L)
 static int __call(lua_State *L)
 {
     const char  *className = luaL_checkstring(L, 2);
-    Class       klass = objc_getClass(className);
+    Class klass = objc_getClass(className);
 
-    if (!klass)
-    {
+    if (!klass) {
         Class superClass;
 
-        if (lua_isuserdata(L, 3))
-        {
+        if (lua_isuserdata(L, 3)) {
             wax_instance_userdata *instanceUserdata = (wax_instance_userdata *)luaL_checkudata(L, 3, WAX_INSTANCE_METATABLE_NAME);
             superClass = instanceUserdata->instance;
-        }
-        else if (lua_isnoneornil(L, 3))
-        {
+        } else if (lua_isnoneornil(L, 3)) {
             superClass = [NSObject class];
-        }
-        else
-        {
+        } else {
             const char *superClassName = luaL_checkstring(L, 3);
             superClass = objc_getClass(superClassName);
         }
 
-        if (!superClass)
-        {
+        if (!superClass) {
             luaL_error(L, "Failed to create '%s'. Unknown superclass \"%s\" received.", className, luaL_checkstring(L, 3));
         }
 
         klass = objc_allocateClassPair(superClass, className, 0);
-        NSUInteger  size;
-        NSUInteger  alignment;
+        NSUInteger size;
+        NSUInteger alignment;
         NSGetSizeAndAlignment("*", &size, &alignment);
-        class_addIvar(klass, WAX_CLASS_INSTANCE_USERDATA_IVAR_NAME, size, alignment, "*");	// Holds a reference to the lua userdata
+        class_addIvar(klass, WAX_CLASS_INSTANCE_USERDATA_IVAR_NAME, size, alignment, "*");  // Holds a reference to the lua userdata
         objc_registerClassPair(klass);
 
-		// Make Key-Value complient
+        // Make Key-Value complient
         class_addMethod(klass, @selector(setValue:forUndefinedKey:), (IMP)setValueForUndefinedKey, "v@:@@");
         class_addMethod(klass, @selector(valueForUndefinedKey:), (IMP)valueForUndefinedKey, "@@:@");
 
         id metaclass = object_getClass(klass);
 
-		// So objects created in ObjC will get an associated lua object
-		// Store the original allocWithZone implementation in case something secret goes on in there.
-		// Calls to `alloc` always are end up calling `allocWithZone:` so we don't bother handling alloc here.
+        // So objects created in ObjC will get an associated lua object
+        // Store the original allocWithZone implementation in case something secret goes on in there.
+        // Calls to `alloc` always are end up calling `allocWithZone:` so we don't bother handling alloc here.
         Method m = class_getInstanceMethod(metaclass, @selector(allocWithZone:));
 
-		// If we the method has already been swizzled (by the class's super, then
-		// just leave it up to the super!
-        if (method_getImplementation(m) != (IMP)allocWithZone)
-        {
+        // If we the method has already been swizzled (by the class's super, then
+        // just leave it up to the super!
+        if (method_getImplementation(m) != (IMP)allocWithZone) {
             class_addMethod(metaclass, @selector(wax_originalAllocWithZone:), method_getImplementation(m), method_getTypeEncoding(m));
             class_addMethod(metaclass, @selector(allocWithZone:), (IMP)allocWithZone, "@@:^{_NSZone=}");
         }
@@ -144,19 +133,16 @@ static int addProtocols(lua_State *L)
 {
     wax_instance_userdata *instanceUserdata = (wax_instance_userdata *)luaL_checkudata(L, 1, WAX_INSTANCE_METATABLE_NAME);
 
-    if (!instanceUserdata->isClass)
-    {
+    if (!instanceUserdata->isClass) {
         luaL_error(L, "ERROR: Can only set a protocol on a class (You are trying to set one on an instance)");
         return 0;
     }
 
-    for (int i = 2; i <= lua_gettop(L); i++)
-    {
+    for (int i = 2; i <= lua_gettop(L); i++) {
         const char  *protocolName = luaL_checkstring(L, i);
         Protocol    *protocol = objc_getProtocol(protocolName);
 
-        if (!protocol)
-        {
+        if (!protocol) {
             luaL_error(L, "Could not find protocol named '%s'\nHint: Sometimes the runtime cannot automatically find a protocol. Try adding it (via xCode) to the file ProtocolLoader.h", protocolName);
         }
 
@@ -204,7 +190,7 @@ static void setValueForUndefinedKey(id self, SEL cmd, id value, NSString *key)
 static id valueForUndefinedKey(id self, SEL cmd, NSString *key)
 {
     lua_State   *L = wax_currentLuaState();
-    id          result = nil;
+    id result = nil;
 
     BEGIN_STACK_MODIFY(L);
 

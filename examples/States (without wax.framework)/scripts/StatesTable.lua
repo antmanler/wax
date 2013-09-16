@@ -1,8 +1,8 @@
 
 
-waxClass{"StatesTable", UITableViewController, protocols = {"UITableViewDataSource", "UITableViewDelegate"}}
+class = waxClass{"StatesTable", UITableViewController, protocols = {"UITableViewDataSource", "UITableViewDelegate"}}
 
-function init(self)
+function class:init()
   self.super:init()
 
   -- Loads plist from bundle

@@ -10,6 +10,8 @@ void wax_setup();
 
 void wax_start(char *initScript, lua_CFunction extensionFunctions, ...);
 
+void wax_start_from_buffer(char *scriptBuffer, size_t size, lua_CFunction extensionFunctions, ...);
+
 void wax_startWithServer();
 
 void wax_end();

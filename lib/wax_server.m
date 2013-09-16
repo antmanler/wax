@@ -22,7 +22,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 
 - (void)dealloc
 {
-    [self stop];// releases _netService and in/out streams
+    [self stop]; // releases _netService and in/out streams
     gInstance = nil;
     [super dealloc];
 }
@@ -31,8 +31,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 {
     self = [super self];
 
-    if (gInstance)
-    {
+    if (gInstance) {
         [NSException raise:@"Wax Error" format:@"Wax server has already been created"];
     }
 
@@ -48,8 +47,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 
     _ipv4socket = CFSocketCreate(kCFAllocatorDefault, PF_INET, SOCK_STREAM, IPPROTO_TCP, kCFSocketAcceptCallBack, (CFSocketCallBack) & TCPServerAcceptCallBack, &socketCtxt);
 
-    if (_ipv4socket == NULL)
-    {
+    if (_ipv4socket == NULL) {
         error = [[NSError alloc] initWithDomain:@"Wax Error" code:kTCPServerNoSocketsAvailable userInfo:nil];
         _ipv4socket = NULL;
         return NO;
@@ -58,22 +56,20 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
     int yes = 1;
     setsockopt(CFSocketGetNative(_ipv4socket), SOL_SOCKET, SO_REUSEADDR, (void *)&yes, sizeof(yes));
 
-	// set up the IPv4 endpoint; use port 0, so the kernel will choose an arbitrary port for us, which will be advertised using Bonjour
+    // set up the IPv4 endpoint; use port 0, so the kernel will choose an arbitrary port for us, which will be advertised using Bonjour
     struct sockaddr_in addr4;
     memset(&addr4, 0, sizeof(addr4));
     addr4.sin_len = sizeof(addr4);
     addr4.sin_family = AF_INET;
-	//addr4.sin_port = 0;
+    //addr4.sin_port = 0;
     addr4.sin_port = htons(port);
     addr4.sin_addr.s_addr = htonl(INADDR_ANY);
     NSData *address4 = [NSData dataWithBytes:&addr4 length:sizeof(addr4)];
 
-    if (kCFSocketSuccess != CFSocketSetAddress(_ipv4socket, (CFDataRef)address4))
-    {
+    if (kCFSocketSuccess != CFSocketSetAddress(_ipv4socket, (CFDataRef)address4)) {
         error = [[NSError alloc] initWithDomain:@"Wax Error" code:kTCPServerCouldNotBindToIPv4Address userInfo:nil];
 
-        if (_ipv4socket)
-        {
+        if (_ipv4socket) {
             CFRelease(_ipv4socket);
         }
 
@@ -81,14 +77,14 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
         return NO;
     }
 
-	// now that the binding was successful, we get the port number
-	// -- we will need it for the NSNetService
+    // now that the binding was successful, we get the port number
+    // -- we will need it for the NSNetService
     NSData *addr = [(NSData *)CFSocketCopyAddress(_ipv4socket) autorelease];
     memcpy(&addr4, [addr bytes], [addr length]);
 
-	// set up the run loop sources for the sockets
-    CFRunLoopRef        cfrl = CFRunLoopGetCurrent();
-    CFRunLoopSourceRef  source4 = CFSocketCreateRunLoopSource(kCFAllocatorDefault, _ipv4socket, 0);
+    // set up the run loop sources for the sockets
+    CFRunLoopRef cfrl = CFRunLoopGetCurrent();
+    CFRunLoopSourceRef source4 = CFSocketCreateRunLoopSource(kCFAllocatorDefault, _ipv4socket, 0);
     CFRunLoopAddSource(cfrl, source4, kCFRunLoopCommonModes);
     CFRelease(source4);
 
@@ -99,8 +95,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 
 - (BOOL)stop
 {
-    if (_delegate)
-    {
+    if (_delegate) {
         [_delegate disconnected];
     }
 
@@ -113,8 +108,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
     [_outStream release];
     _outStream = nil;
 
-    if (_ipv4socket)
-    {
+    if (_ipv4socket) {
         CFSocketInvalidate(_ipv4socket);
         CFRelease(_ipv4socket);
         _ipv4socket = NULL;
@@ -125,8 +119,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 
 - (BOOL)send:(NSString *)output
 {
-    if (!_outStream)
-    {
+    if (!_outStream) {
         return NO;
     }
 
@@ -136,9 +129,8 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 
 - (void)receive:(NSData *)data
 {
-	// CTRL-D? Then exit!
-    if ((data.length == 1) && (((uint8_t *)[data bytes])[0] == 4))
-    {
+    // CTRL-D? Then exit!
+    if ((data.length == 1) && (((uint8_t *)[data bytes])[0] == 4)) {
         uint8_t outputString[] = "Connection Closed";
         [_outStream write:outputString maxLength:NSUIntegerMax];
         NSUInteger port = [_netService port];
@@ -146,31 +138,27 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
         [self startOnPort:port];
 
         return;
-    }
-    else if (data.length == 0)	// Who cares!
-    {
+    } else if (data.length == 0) {   // Who cares!
         return;
     }
 
-    if (_delegate)
-    {
+    if (_delegate) {
         [_delegate dataReceived:(NSData *)data];
     }
 }
 
 - (BOOL)enableBonjourOnPort:(NSUInteger)port
 {
-    NSString    *domain = @"";	// Will use default Bonjour registration doamins, typically just ".local"
-    NSString    *name = @"";	// Will use default Bonjour name, e.g. the name assigned to the device in iTunes
+    NSString    *domain = @"";  // Will use default Bonjour registration doamins, typically just ".local"
+    NSString    *name = @"";    // Will use default Bonjour name, e.g. the name assigned to the device in iTunes
     NSString    *protocol = [NSString stringWithFormat:@"_%@._tcp.", @"luadebug"];
 
-	// First stop existing services
+    // First stop existing services
     [self disableBonjour];
 
     _netService = [[NSNetService alloc] initWithDomain:domain type:protocol name:name port:port];
 
-    if (_netService == nil)
-    {
+    if (_netService == nil) {
         return NO;
     }
 
@@ -183,8 +171,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 
 - (void)disableBonjour
 {
-    if (_netService)
-    {
+    if (_netService) {
         [_netService stop];
         [_netService removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
         [_netService release];
@@ -194,8 +181,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 
 - (void)handleNewConnectionFromAddress:(NSData *)addr inputStream:(NSInputStream *)inStream outputStream:(NSOutputStream *)outStream
 {
-    if (_inStream || _outStream)
-    {
+    if (_inStream || _outStream) {
         [NSException raise:@"Debug Server Error" format:@"Woah, a new connection came in. I have no idea what to do in this situation."];
         return;
     }
@@ -210,8 +196,7 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
     [_outStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [_outStream open];
 
-    if (_delegate)
-    {
+    if (_delegate) {
         [_delegate connected];
     }
 }
@@ -241,36 +226,33 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 // ---------------
 - (void)stream:(NSStream *)stream handleEvent:(NSStreamEvent)streamEvent
 {
-    if (stream != _inStream)
-    {
+    if (stream != _inStream) {
         return;
     }
 
-    switch (streamEvent)
+    switch (streamEvent) {
+    case NSStreamEventHasBytesAvailable:
     {
-        case NSStreamEventHasBytesAvailable:
-            {
-                uint8_t         bytes[1024];
-                int             length = 0;
-                NSMutableData   *data = [NSMutableData data];
+        uint8_t bytes[1024];
+        int length = 0;
+        NSMutableData   *data = [NSMutableData data];
 
-                while ([_inStream hasBytesAvailable])
-                {
-                    length = [_inStream read:bytes maxLength:sizeof(bytes)];
-                    [data appendBytes:bytes length:length];
-                }
+        while ([_inStream hasBytesAvailable]) {
+            length = [_inStream read:bytes maxLength:sizeof(bytes)];
+            [data appendBytes:bytes length:length];
+        }
 
-                [self receive:data];
+        [self receive:data];
 
-                break;
-            }
+        break;
+    }
 
-        case NSStreamEventErrorOccurred:
-            NSLog(@"Error: Stream error encountered!");
-            break;
+    case NSStreamEventErrorOccurred:
+        NSLog(@"Error: Stream error encountered!");
+        break;
 
-        default:
-            break;
+    default:
+        break;
     }
 }
 
@@ -281,42 +263,35 @@ static void TCPServerAcceptCallBack(CFSocketRef socket, CFSocketCallBackType typ
 {
     wax_server *server = (wax_server *)info;
 
-    if (kCFSocketAcceptCallBack == type)
-    {
-		// For an AcceptCallBack, the data parameter is a pointer to a CFSocketNativeHandle
-        CFSocketNativeHandle    nativeSocketHandle = *(CFSocketNativeHandle *)data;
-        uint8_t                 name[SOCK_MAXADDRLEN];
-        socklen_t               namelen = sizeof(name);
+    if (kCFSocketAcceptCallBack == type) {
+        // For an AcceptCallBack, the data parameter is a pointer to a CFSocketNativeHandle
+        CFSocketNativeHandle nativeSocketHandle = *(CFSocketNativeHandle *)data;
+        uint8_t name[SOCK_MAXADDRLEN];
+        socklen_t namelen = sizeof(name);
         NSData                  *peer = nil;
 
-        if (0 == getpeername(nativeSocketHandle, (struct sockaddr *)name, &namelen))
-        {
+        if (0 == getpeername(nativeSocketHandle, (struct sockaddr *)name, &namelen)) {
             peer = [NSData dataWithBytes:name length:namelen];
         }
 
-        CFReadStreamRef     readStream = NULL;
-        CFWriteStreamRef    writeStream = NULL;
+        CFReadStreamRef readStream = NULL;
+        CFWriteStreamRef writeStream = NULL;
         CFStreamCreatePairWithSocket(kCFAllocatorDefault, nativeSocketHandle, &readStream, &writeStream);
 
-        if (readStream && writeStream)
-        {
+        if (readStream && writeStream) {
             CFReadStreamSetProperty(readStream, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanTrue);
             CFWriteStreamSetProperty(writeStream, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanTrue);
             [server handleNewConnectionFromAddress:peer inputStream:(NSInputStream *)readStream outputStream:(NSOutputStream *)writeStream];
-        }
-        else
-        {
-			// on any failure, need to destroy the CFSocketNativeHandle since we are not going to use it any more
+        } else {
+            // on any failure, need to destroy the CFSocketNativeHandle since we are not going to use it any more
             close(nativeSocketHandle);
         }
 
-        if (readStream)
-        {
+        if (readStream) {
             CFRelease(readStream);
         }
 
-        if (writeStream)
-        {
+        if (writeStream) {
             CFRelease(writeStream);
         }
     }

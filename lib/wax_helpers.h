@@ -67,15 +67,15 @@
     }
 
 #ifndef LOG_FLAGS
-  #define LOG_FLAGS         (LOG_FATAL | LOG_ERROR | LOG_DEBUG)
+  #define LOG_FLAGS         (WAX_LOG_FATAL | WAX_LOG_ERROR | WAX_LOG_DEBUG)
 #endif
 
-#define LOG_DEBUG           1 << 0
-        #define LOG_ERROR   1 << 1
-        #define LOG_FATAL   1 << 2
+#define WAX_LOG_DEBUG       1 << 0
+#define WAX_LOG_ERROR       1 << 1
+#define WAX_LOG_FATAL       1 << 2
 
-        #define LOG_GC      1 << 5
-        #define LOG_NETWORK 1 << 6
+#define WAX_LOG_GC          1 << 5
+#define WAX_LOG_NETWORK     1 << 6
 
 // Debug Helpers
 void wax_printStack(lua_State *L);

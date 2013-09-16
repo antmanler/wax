@@ -13,7 +13,7 @@
 
 typedef struct _wax_struct_userdata {
     void    *data;
-    int     size;
+    int size;
     char    *name;
     char    *typeDescription;
 } wax_struct_userdata;

@@ -1,5 +1,4 @@
 /*
-
 ** $Id: llex.h,v 1.58.1.1 2007/12/27 13:02:25 roberto Exp $
 ** Lexical Analyzer
 ** See Copyright Notice in lua.h
@@ -12,10 +11,10 @@
 #include "lzio.h"
 
 
-#define FIRST_RESERVED    257
+#define FIRST_RESERVED	257
 
 /* maximum length of a reserved word */
-#define TOKEN_LEN    (sizeof("function")/sizeof(char))
+#define TOKEN_LEN	(sizeof("function")/sizeof(char))
 
 
 /*
@@ -34,7 +33,7 @@ enum RESERVED {
 };
 
 /* number of reserved words */
-#define NUM_RESERVED    (cast(int, TK_WHILE-FIRST_RESERVED+1))
+#define NUM_RESERVED	(cast(int, TK_WHILE-FIRST_RESERVED+1))
 
 
 /* array with token `names' */
